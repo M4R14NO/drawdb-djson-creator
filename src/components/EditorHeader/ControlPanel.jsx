@@ -100,6 +100,14 @@ export default function ControlPanel({ title, setTitle, lastSaved }) {
     filename: `${title}_${new Date().toISOString()}`,
     extension: "",
   });
+  const [djsonModalOpen, setDjsonModalOpen] = useState(false);
+  const [djsonOptions, setDjsonOptions] = useState({
+  namespace: "com.example.entities",
+  prefix: "",
+  useDefaultId: false,
+  single: false,
+  tableName: "",
+});
   const [importFrom, setImportFrom] = useState(IMPORT_FROM.JSON);
   const { saveState, setSaveState } = useSaveState();
   const { layout, setLayout } = useLayout();
@@ -981,10 +989,7 @@ export default function ControlPanel({ title, setTitle, lastSaved }) {
             },
             {
               name: "d.json (Axon Ivy)",
-              function: () => {
-                const namespace = window.prompt("Enter namespace:", "com.example.entities");
-                if (namespace) exportDJson(tables, relationships, types, database, namespace);
-              },
+              function: () => setDjsonModalOpen(true),
             },
             {
               name: "SQLite",
@@ -1618,6 +1623,66 @@ export default function ControlPanel({ title, setTitle, lastSaved }) {
         open={modal === MODAL.CONFIG_CUSTOM_TYPES}
         onClose={() => setModal(MODAL.NONE)}
       />
+      {djsonModalOpen && (
+  <div style={{
+    position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)",
+    display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999
+  }}>
+    <div style={{
+      background: "white", borderRadius: 8, padding: 24, width: 480,
+      display: "flex", flexDirection: "column", gap: 16
+    }}>
+      <h3 style={{ margin: 0 }}>Export d.json (Axon Ivy)</h3>
+
+      <label>
+        <strong>Namespace</strong> <span style={{color:"gray", fontSize:12}}>— Java package path for generated classes, e.g. com.example.entities</span>
+        <input style={{ display:"block", width:"100%", marginTop:4, padding:4 }}
+          value={djsonOptions.namespace}
+          onChange={e => setDjsonOptions(p => ({...p, namespace: e.target.value}))} />
+      </label>
+
+      <label>
+        <strong>Prefix</strong> <span style={{color:"gray", fontSize:12}}>— Optional class & table name prefix, e.g. "History" → HistoryKategorie</span>
+        <input style={{ display:"block", width:"100%", marginTop:4, padding:4 }}
+          value={djsonOptions.prefix}
+          onChange={e => setDjsonOptions(p => ({...p, prefix: e.target.value}))} />
+      </label>
+
+      <label style={{ display:"flex", alignItems:"center", gap:8 }}>
+        <input type="checkbox" checked={djsonOptions.useDefaultId}
+          onChange={e => setDjsonOptions(p => ({...p, useDefaultId: e.target.checked}))} />
+        <span><strong>Use Default ID</strong> — Use GENERATED modifier instead of SequenceGenerator annotations</span>
+      </label>
+
+      <label style={{ display:"flex", alignItems:"center", gap:8 }}>
+        <input type="checkbox" checked={djsonOptions.single}
+          onChange={e => setDjsonOptions(p => ({...p, single: e.target.checked, tableName: ""}))} />
+        <span><strong>Single mode</strong> — Diagram must contain exactly one table; enables tableName override</span>
+      </label>
+
+      {djsonOptions.single && (
+        <label>
+          <strong>Table Name Override</strong> <span style={{color:"gray", fontSize:12}}>— Override the entity tableName (single mode only)</span>
+          <input style={{ display:"block", width:"100%", marginTop:4, padding:4 }}
+            value={djsonOptions.tableName}
+            onChange={e => setDjsonOptions(p => ({...p, tableName: e.target.value}))} />
+        </label>
+      )}
+
+      <div style={{ display:"flex", gap:8, justifyContent:"flex-end" }}>
+        <button onClick={() => setDjsonModalOpen(false)}
+          style={{ padding:"6px 16px" }}>Cancel</button>
+        <button onClick={() => {
+            setDjsonModalOpen(false);
+            exportDJson(tables, relationships, types, database, djsonOptions);
+          }}
+          style={{ padding:"6px 16px", background:"#2563eb", color:"white", border:"none", borderRadius:4 }}>
+          Export
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </>
   );
 
