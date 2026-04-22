@@ -1,4 +1,5 @@
 import { useContext, useState } from "react";
+import { exportDJson } from "../../utils/exportDJson";
 import {
   IconCaretdown,
   IconChevronRight,
@@ -976,6 +977,13 @@ export default function ControlPanel({ title, setTitle, lastSaved }) {
                   data: src,
                   extension: "sql",
                 }));
+              },
+            },
+            {
+              name: "d.json (Axon Ivy)",
+              function: () => {
+                const namespace = window.prompt("Enter namespace:", "com.example.entities");
+                if (namespace) exportDJson(tables, relationships, types, database, namespace);
               },
             },
             {
