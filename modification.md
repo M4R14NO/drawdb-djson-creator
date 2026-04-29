@@ -20,8 +20,8 @@ A dialog will appear with the following options:
 
 | Option | Description |
 |---|---|
-| **Namespace** | Java package path for the generated classes, e.g. `com.example.entities` |
-| **Prefix** | Optional prefix added to class and table names, e.g. `History` → `HistoryKategorie` |
+| **Namespace** | Java package path for the generated classes, e.g. `drawdb.entities` |
+| **Prefix** | Optional prefix added to class and table names, e.g. `History` → `HistoryCompany` |
 | **Use Default ID** | Emits the `GENERATED` modifier on the id field instead of `@SequenceGenerator` annotations |
 | **Single mode** | Use when your diagram contains exactly one table; enables the Table Name Override option |
 | **Table Name Override** | *(Single mode only)* Overrides the entity `tableName` in the generated d.json |
@@ -31,7 +31,12 @@ Click **Export** to download a `.zip` file containing:
 - `input.sql` — the PostgreSQL DDL that was used as input
 - `warnings.log` — any SQL types that could not be mapped and were fallen back to `String`
 
+The d.json files can be copied into an Axon Ivy 12 project:
+<img width="1888" height="796" alt="image" src="https://github.com/user-attachments/assets/24c571fc-54cc-41ee-a04d-d6b0cf4d1691" />
+
+
 > **Note:** The export requires the backend service to be running (see Setup below).
+
 
 ---
 
