@@ -5,6 +5,12 @@ This fork of [drawDB](https://github.com/drawdb-io/drawdb) adds an export featur
 ---
 
 ## Export d.json from the Diagram Editor
+For an example,
+- create a new generic project in the drawdb frontend,
+- import the json file from the `example` folder
+
+The imported diagram looks as follows:
+  <img width="1075" height="471" alt="image" src="https://github.com/user-attachments/assets/4d741449-e860-402d-b4fb-496bcfcf3a44" />
 
 In the diagram editor, open **File → Export SQL → d.json (Axon Ivy)**.
 
