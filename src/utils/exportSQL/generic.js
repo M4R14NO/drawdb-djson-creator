@@ -1,4 +1,4 @@
-import { DB } from "../../data/constants";
+import { DB, Cardinality } from "../../data/constants";
 import { dbToTypes, defaultTypes } from "../../data/datatypes";
 import { escapeQuotes, getInlineFK, parseDefault } from "./shared";
 
@@ -301,7 +301,7 @@ export function jsonToPostgreSQL(obj) {
                 field.name
               }" ${getTypeString(field, obj.database, DB.POSTGRES)}${
                 field.notNull ? " NOT NULL" : ""
-              }${field.unique ? " UNIQUE" : ""}${
+              }${field.unique || obj.references.some((r) => r.startFieldId === field.id && r.startTableId === table.id && r.cardinality === Cardinality.ONE_TO_ONE) ? " UNIQUE" : ""}${
                 field.default !== "" ? ` DEFAULT ${parseDefault(field)}` : ""
               }${
                 field.check === "" ||

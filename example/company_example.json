@@ -1,0 +1,304 @@
+{
+  "tables": [
+    {
+      "id": "m03qVT9BCFbz_iWGdYGzq",
+      "name": "company",
+      "comment": "",
+      "color": "#175e7a",
+      "fields": [
+        {
+          "id": "j-A88V-ys4O2Z6by5uW-0",
+          "name": "id",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": true,
+          "unique": true,
+          "notNull": false,
+          "increment": true,
+          "comment": ""
+        },
+        {
+          "id": "JAS26kgFu_wyWnVTWqbS9",
+          "name": "name",
+          "type": "VARCHAR",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": ""
+        },
+        {
+          "id": "MubvbinaXE6_qQW6kKrnH",
+          "name": "founded_date",
+          "type": "DATE",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": false,
+          "increment": false,
+          "comment": ""
+        },
+        {
+          "id": "G0gaTx177IlMmE7Z3w64I",
+          "name": "headquarters",
+          "type": "VARCHAR",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": false,
+          "increment": false,
+          "comment": ""
+        }
+      ],
+      "indices": [],
+      "x": -49.39782002244169,
+      "y": -101.49167150714169
+    },
+    {
+      "id": "0flQ-dhB_MSpFi6QCgtnj",
+      "name": "department",
+      "comment": "",
+      "color": "#175e7a",
+      "fields": [
+        {
+          "id": "kWmXmV9_4MtFFuhyaA93u",
+          "name": "id",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": true,
+          "unique": true,
+          "notNull": false,
+          "increment": true,
+          "comment": ""
+        },
+        {
+          "id": "m-fySMStCfjAll2-7hyLO",
+          "name": "name",
+          "type": "VARCHAR",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": ""
+        },
+        {
+          "id": "ANMOl6z0bXiP2qsjpYb_F",
+          "name": "company_id",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": ""
+        },
+        {
+          "id": "a5tt9kz9ceBrNNIWiSQ1m",
+          "name": "budget",
+          "type": "NUMERIC",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": false,
+          "increment": false,
+          "comment": ""
+        }
+      ],
+      "indices": [],
+      "x": -113.20991337374241,
+      "y": 132.51381156485513
+    },
+    {
+      "id": "cDr_gYB440mdZ_WRF3xM1",
+      "name": "boss",
+      "comment": "",
+      "color": "#175e7a",
+      "fields": [
+        {
+          "id": "LGhsecAlKMjeCSY8hv7SM",
+          "name": "id",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": true,
+          "unique": true,
+          "notNull": false,
+          "increment": true,
+          "comment": ""
+        },
+        {
+          "id": "cBt8D-hVtpKIGHVBF82At",
+          "name": "employee_id",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": ""
+        },
+        {
+          "id": "9diuTeqr1Gmj8HQTUBpFj",
+          "name": "since",
+          "type": "DATE",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": false,
+          "increment": false,
+          "comment": ""
+        }
+      ],
+      "indices": [],
+      "x": 633.4308910508336,
+      "y": -107.55794280616813
+    },
+    {
+      "id": "rCe7P-h_aZd7c21cL1Pa3",
+      "name": "employee",
+      "comment": "",
+      "color": "#175e7a",
+      "fields": [
+        {
+          "id": "MdG1m_BndptMzOolD9kp4",
+          "name": "id",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": true,
+          "unique": true,
+          "notNull": false,
+          "increment": true,
+          "comment": ""
+        },
+        {
+          "id": "SbgN_Dk83J5RoebNgOUo6",
+          "name": "first_name",
+          "type": "VARCHAR",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": ""
+        },
+        {
+          "id": "DOZvVN3bY07a511Hfffkc",
+          "name": "last_name",
+          "type": "VARCHAR",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": ""
+        },
+        {
+          "id": "vcTWnund3H2iIlCo0YsWS",
+          "name": "email",
+          "type": "VARCHAR",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": false,
+          "increment": false,
+          "comment": ""
+        },
+        {
+          "id": "L4QlsdB6EfzFv9syoRVXw",
+          "name": "hire_date",
+          "type": "DATE",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": false,
+          "increment": false,
+          "comment": ""
+        },
+        {
+          "id": "RRmSU7Fv-42IQnoEDflC1",
+          "name": "salary",
+          "type": "NUMERIC",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": false,
+          "increment": false,
+          "comment": ""
+        },
+        {
+          "id": "MicCpS5KY7Vu-cJRWOrkK",
+          "name": "department_id",
+          "type": "INTEGER",
+          "default": "",
+          "check": "",
+          "primary": false,
+          "unique": false,
+          "notNull": true,
+          "increment": false,
+          "comment": ""
+        }
+      ],
+      "indices": [],
+      "x": 257.53034707905084,
+      "y": -15.044186046498822
+    }
+  ],
+  "relationships": [
+    {
+      "name": "fk_department_company_id_company",
+      "startTableId": "0flQ-dhB_MSpFi6QCgtnj",
+      "endTableId": "m03qVT9BCFbz_iWGdYGzq",
+      "endFieldId": "j-A88V-ys4O2Z6by5uW-0",
+      "startFieldId": "ANMOl6z0bXiP2qsjpYb_F",
+      "id": "UQNT8opukz-Avlp5YpweA",
+      "updateConstraint": "No action",
+      "deleteConstraint": "No action",
+      "cardinality": "many_to_one"
+    },
+    {
+      "name": "fk_employee_department_id_department",
+      "startTableId": "rCe7P-h_aZd7c21cL1Pa3",
+      "endTableId": "0flQ-dhB_MSpFi6QCgtnj",
+      "endFieldId": "kWmXmV9_4MtFFuhyaA93u",
+      "startFieldId": "MicCpS5KY7Vu-cJRWOrkK",
+      "id": "NsboGIlSCjnajQNi2TFK2",
+      "updateConstraint": "No action",
+      "deleteConstraint": "No action",
+      "cardinality": "many_to_one"
+    },
+    {
+      "name": "fk_boss_employee_id_employee",
+      "startTableId": "cDr_gYB440mdZ_WRF3xM1",
+      "endTableId": "rCe7P-h_aZd7c21cL1Pa3",
+      "endFieldId": "MdG1m_BndptMzOolD9kp4",
+      "startFieldId": "cBt8D-hVtpKIGHVBF82At",
+      "id": "JxPG9rjLLEUTlxoLjJEIv",
+      "updateConstraint": "No action",
+      "deleteConstraint": "No action",
+      "cardinality": "one_to_one"
+    }
+  ],
+  "notes": [],
+  "subjectAreas": [],
+  "database": "generic",
+  "types": [],
+  "title": "Company_usecase"
+}

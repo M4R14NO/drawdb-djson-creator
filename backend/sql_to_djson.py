@@ -279,7 +279,7 @@ def parse_alter_fks(stmts: list[str]) -> list[AlterFk]:
     fks = []
     for stmt in stmts:
         m = re.match(
-            r"ALTER\s+TABLE\s+\"?(\w+)\"?\s+ADD\s+CONSTRAINT\s+\S+\s+FOREIGN\s+KEY\s*\(\"?(\w+)\"?\)\s+REFERENCES\s+\"?(\w+)\"?\s*(?:\(\"?(\w+)\"?\))?",
+            r"ALTER\s+TABLE\s+\"?(\w+)\"?\s+ADD\s+(?:CONSTRAINT\s+\S+\s+)?FOREIGN\s+KEY\s*\(\"?(\w+)\"?\)\s+REFERENCES\s+\"?(\w+)\"?\s*(?:\(\"?(\w+)\"?\))?",
             stmt, re.IGNORECASE | re.DOTALL)
         if m:
             fks.append(AlterFk(m.group(1), m.group(2), m.group(3), m.group(4) or "id"))
@@ -347,6 +347,25 @@ def build_one_to_many_field(fname: str, ref_table: str, mapped_by: str, namespac
     }
 
 
+def build_one_to_one_owning_field(fname: str, ref_table: str, namespace: str, prefix: Optional[str]) -> dict:
+    return {
+        "name": fname,
+        "type": assoc_type(namespace, ref_table, prefix),
+        "modifiers": ["PERSISTENT"],
+        "entity": {"association": "ONE_TO_ONE", "cascadeTypes": ["PERSIST", "MERGE"], "orphanRemoval": False}
+    }
+
+
+def build_one_to_one_inverse_field(fname: str, ref_table: str, mapped_by: str, namespace: str, prefix: Optional[str]) -> dict:
+    return {
+        "name": fname,
+        "type": assoc_type(namespace, ref_table, prefix),
+        "modifiers": ["PERSISTENT"],
+        "entity": {"association": "ONE_TO_ONE", "cascadeTypes": ["PERSIST", "MERGE"],
+                   "mappedByFieldName": mapped_by, "orphanRemoval": False}
+    }
+
+
 # ---------------------------------------------------------------------------
 # d.json document builder
 # ---------------------------------------------------------------------------
@@ -359,6 +378,8 @@ def build_djson(
     one_to_many_additions: list[tuple[str, str, str]],
     fk_cols: set[str],
     many_to_one_fields: list[tuple[str, str, str]],
+    one_to_one_owning_fields: list[tuple[str, str, str]],
+    one_to_one_inverse_fields: list[tuple[str, str, str]],
     single_mode: bool = False,
     override_table_name: Optional[str] = None,
 ) -> dict:
@@ -376,8 +397,14 @@ def build_djson(
     for (fname, ref_table, _) in many_to_one_fields:
         fields.append(build_many_to_one_field(fname, ref_table, namespace, prefix))
 
+    for (fname, ref_table, _) in one_to_one_owning_fields:
+        fields.append(build_one_to_one_owning_field(fname, ref_table, namespace, prefix))
+
     for (fname, owning_table, mapped_by) in one_to_many_additions:
         fields.append(build_one_to_many_field(fname, owning_table, mapped_by, namespace, prefix))
+
+    for (fname, owning_table, mapped_by) in one_to_one_inverse_fields:
+        fields.append(build_one_to_one_inverse_field(fname, owning_table, mapped_by, namespace, prefix))
 
     # entity block
     if single_mode:
@@ -404,23 +431,35 @@ def build_djson(
 
 def resolve_associations(tables: dict[str, TableInfo], alter_fks: list[AlterFk],
                          namespace: str, prefix: Optional[str]) -> dict[str, dict]:
-    result: dict[str, dict] = {t: {"fk_cols": set(), "many_to_one": [], "one_to_many": []} for t in tables}
+    def _empty_entry() -> dict:
+        return {"fk_cols": set(), "many_to_one": [], "one_to_many": [],
+                "one_to_one_owning": [], "one_to_one_inverse": []}
+
+    result: dict[str, dict] = {t: _empty_entry() for t in tables}
 
     def get_pks(tname: str) -> set[str]:
         return {c.name for c in tables[tname].columns if c.is_pk} if tname in tables else set()
 
+    def is_unique_col(tname: str, col: str) -> bool:
+        return any(c.name == col and c.is_unique for c in tables.get(tname, TableInfo("")).columns)
+
     def register(owning: str, fk_col: str, ref: str, mapped_by_hint: Optional[str] = None):
         if owning not in result:
-            result[owning] = {"fk_cols": set(), "many_to_one": [], "one_to_many": []}
+            result[owning] = _empty_entry()
         if ref not in result:
-            result[ref] = {"fk_cols": set(), "many_to_one": [], "one_to_many": []}
+            result[ref] = _empty_entry()
 
         fname = to_camel(fk_col[:-3] if fk_col.lower().endswith("_id") else fk_col)
         result[owning]["fk_cols"].add(fk_col)
-        result[owning]["many_to_one"].append((fname, ref, fk_col))
 
-        back = pluralize_camel(to_camel(owning))
-        result[ref]["one_to_many"].append((back, owning, mapped_by_hint or fname))
+        if is_unique_col(owning, fk_col):
+            result[owning]["one_to_one_owning"].append((fname, ref, fk_col))
+            back = to_camel(owning)
+            result[ref]["one_to_one_inverse"].append((back, owning, mapped_by_hint or fname))
+        else:
+            result[owning]["many_to_one"].append((fname, ref, fk_col))
+            back = pluralize_camel(to_camel(owning))
+            result[ref]["one_to_many"].append((back, owning, mapped_by_hint or fname))
 
     for tname, table in tables.items():
         for (fk_col, ref_table, _) in table.inline_fks:
@@ -483,7 +522,8 @@ def main():
     assoc = resolve_associations(tables, alter_fks, args.namespace, args.prefix)
 
     for tname, table in tables.items():
-        info = assoc.get(tname, {"fk_cols": set(), "many_to_one": [], "one_to_many": []})
+        info = assoc.get(tname, {"fk_cols": set(), "many_to_one": [], "one_to_many": [],
+                                  "one_to_one_owning": [], "one_to_one_inverse": []})
         djson = build_djson(
             table=table,
             namespace=args.namespace,
@@ -492,6 +532,8 @@ def main():
             one_to_many_additions=info["one_to_many"],
             fk_cols=info["fk_cols"],
             many_to_one_fields=info["many_to_one"],
+            one_to_one_owning_fields=info["one_to_one_owning"],
+            one_to_one_inverse_fields=info["one_to_one_inverse"],
             single_mode=args.single,
             override_table_name=args.tableName if args.single else None,
         )
