@@ -5,12 +5,14 @@ This fork of [drawDB](https://github.com/drawdb-io/drawdb) adds an export featur
 ---
 
 ## Export d.json from the Diagram Editor
-For an example,
-- create a new generic project in the drawdb frontend,
-- import the json file from the `example` folder
 
-The imported diagram looks as follows:
-  <img width="1075" height="471" alt="image" src="https://github.com/user-attachments/assets/4d741449-e860-402d-b4fb-496bcfcf3a44" />
+To try the export with a ready-made example:
+- Create a new **Generic** project in the drawdb frontend
+- Import the `example/company_example.json` file via **File → Import diagram**
+
+The imported diagram shows a small company schema with four tables and relationships of every supported association type:
+
+<img width="1075" height="471" alt="image" src="https://github.com/user-attachments/assets/4d741449-e860-402d-b4fb-496bcfcf3a44" />
 
 In the diagram editor, open **File → Export SQL → d.json (Axon Ivy)**.
 
@@ -30,6 +32,54 @@ Click **Export** to download a `.zip` file containing:
 - `warnings.log` — any SQL types that could not be mapped and were fallen back to `String`
 
 > **Note:** The export requires the backend service to be running (see Setup below).
+
+---
+
+## Association Types
+
+A key feature of the d.json export is that foreign key columns are not exported as plain integer IDs — they are resolved into proper JPA associations with typed object references. All three standard JPA association types are supported.
+
+### MANY_TO_ONE / ONE_TO_MANY
+
+A regular foreign key (no `UNIQUE` constraint) is treated as a many-to-one relationship. The exporter generates:
+- A **`MANY_TO_ONE`** field on the owning side (the table holding the FK), replacing the raw FK column with a typed object reference
+- A **`ONE_TO_MANY`** field (`java.util.Set<...>`) on the referenced side, with `mappedByFieldName` pointing back to the owning field
+
+**Example** — `department.company_id` references `company.id`:
+
+`Department.d.json`:
+```json
+{ "name": "company", "type": "com.example.entities.Company",
+  "entity": { "association": "MANY_TO_ONE", ... } }
+```
+
+`Company.d.json`:
+```json
+{ "name": "departmenten", "type": "java.util.Set<com.example.entities.Department>",
+  "entity": { "association": "ONE_TO_MANY", "mappedByFieldName": "company", ... } }
+```
+
+### ONE_TO_ONE
+
+When a foreign key column is marked as **UNIQUE** in the diagram (or the relationship cardinality is set to `1:1`), it is treated as a one-to-one relationship. The exporter generates:
+- A **`ONE_TO_ONE`** field on the owning side (the table holding the FK)
+- A **`ONE_TO_ONE`** field on the referenced side with `mappedByFieldName`, using a singular type (not a `Set`)
+
+**Example** — `boss.employee_id` references `employee.id` with a 1:1 cardinality:
+
+`Boss.d.json`:
+```json
+{ "name": "employee", "type": "com.example.entities.Employee",
+  "entity": { "association": "ONE_TO_ONE", ... } }
+```
+
+`Employee.d.json`:
+```json
+{ "name": "boss", "type": "com.example.entities.Boss",
+  "entity": { "association": "ONE_TO_ONE", "mappedByFieldName": "employee", ... } }
+```
+
+> **Tip:** To get `ONE_TO_ONE` output, either mark the FK column as `UNIQUE` in the drawdb field editor, or set the relationship cardinality to `1:1` via the relationship properties panel.
 
 ---
 
